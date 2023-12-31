@@ -27,6 +27,7 @@ const ProfileHeader = ({
               src={image}
               alt={name}
               fill
+              priority
               className="rounded-full object-cover shadow-2xl"
             />
           </div>

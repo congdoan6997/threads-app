@@ -60,9 +60,13 @@ function AccountProfile({ user, btnTitle }: AccountProfileProps) {
 
   const onSubmit = async (values: z.infer<typeof UserValidation>) => {
     const blob = values.profile_photo;
+    // console.log('blob::', blob)
     const hasImageChanged = isBase64Image(blob);
+    // console.log('hasImageChanged::', hasImageChanged)
     if (hasImageChanged) {
+      // console.log('files::', files)
       const imgRes = await startUpload(files);
+      // console.log('imgRes::', imgRes)
       if (imgRes && imgRes[0].url) {
         values.profile_photo = imgRes[0].url;
       }
@@ -89,18 +93,24 @@ function AccountProfile({ user, btnTitle }: AccountProfileProps) {
     e.preventDefault();
 
     const fileReader = new FileReader();
-    if (e.target.files && e.target.files[0]) {
+
+    if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
+      // console.log('file::', file)
       setFiles(Array.from(e.target.files));
 
+      // console.log('files', files);
       if (!file.type.includes("image")) return;
 
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        if (fileReader.readyState === 2) {
-          fieldChange(fileReader.result as string);
-        }
+      fileReader.onload = async (event) => {
+        const imageDataUrl = event.target?.result?.toString() || "";
+        // console.log('imageDataUrl::', imageDataUrl)
+        fieldChange(imageDataUrl);
       };
+
+      fileReader.readAsDataURL(file);
+
+      // console.log('fileReader::', fileReader)
     }
   };
 
