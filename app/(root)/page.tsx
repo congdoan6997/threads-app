@@ -1,10 +1,19 @@
-import { fetchPosts } from "@/lib/actions";
+import { fetchPosts, fetchUser } from "@/lib/actions";
 // clerk user
 import { currentUser } from "@clerk/nextjs";
 // components
 import { ThreadCard } from "@/components/cards";
+import { redirect } from "next/navigation";
 export default async function Home() {
   const user = await currentUser();
+  // console.log('user::', user);
+  if (!user) return null;
+
+  const userInfo = await fetchUser(user.id);
+  // console.log('userInfo', userInfo)
+  if (!userInfo?.onboarded) {
+    redirect("/onboarding");
+  }
 
   const { posts, isNext } = await fetchPosts(1, 30);
 

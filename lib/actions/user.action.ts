@@ -54,6 +54,7 @@ export async function fetchUser(userId: string) {
     // });
   } catch (error: any) {
     throw new Error(`Failed to fetch user: ${error.message}`);
+    // console.log(error);
   }
 }
 
