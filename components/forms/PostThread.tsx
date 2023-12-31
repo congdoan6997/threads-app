@@ -2,8 +2,6 @@
 // hooks
 import { useForm } from "react-hook-form";
 import { usePathname, useRouter } from "next/navigation";
-// uploadthing
-import { useUploadThing } from "@/lib/uploadthing";
 // components
 import { Button } from "@/components/ui/button";
 import {
@@ -15,41 +13,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+
 import { Textarea } from "../ui/textarea";
 // zod
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-// validation
-import { UserValidation } from "@/lib/validations/user";
-// react
-import Image from "next/image";
-import { ChangeEvent, useState } from "react";
-
-// utils
-import { isBase64Image } from "@/lib/utils";
 // server action
 import { createThread, updateUser } from "@/lib/actions";
 // validations
 import { ThreadValidation } from "@/lib/validations";
-import { Thread } from "@/lib/models";
-import { revalidatePath } from "next/cache";
 
-interface AccountProfileProps {
-  user: {
-    id: string;
-    objectId: string;
-    username: string;
-    name: string;
-    bio: string;
-    image: string;
-  };
-  btnTitle: string;
-}
+import { useOrganization } from "@clerk/nextjs";
 
 function PostThread({ userId }: { userId: string }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { organization } = useOrganization();
 
   const form = useForm({
     resolver: zodResolver(ThreadValidation),
@@ -59,13 +38,14 @@ function PostThread({ userId }: { userId: string }) {
     },
   });
   const onSubmit = async (values: z.infer<typeof ThreadValidation>) => {
+    // console.log('ORGANIZATION:', organization);
     await createThread({
       text: values.thread,
       author: userId,
-      communityId: null,
+      communityId: organization ? organization.id : null,
       path: pathname,
     });
-    // revalidatePath("/");
+
     router.push("/");
   };
   return (
